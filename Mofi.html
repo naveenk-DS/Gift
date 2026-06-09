@@ -443,7 +443,6 @@
 
         #screen3 {
             position: relative;
-            overflow: hidden;
         }
 
         #screen3>*:not(.bfne-bg) {
@@ -451,28 +450,28 @@
             z-index: 1;
         }
 
-        /* ── Surprise FAB button (bottom right of screen3) ────────────── */
+        /* ── Surprise FAB button (fixed center bottom) ────────────────── */
         .surprise-fab {
-            position: absolute;
-            bottom: 1rem;
-            right: 50%;
-            transform: translateX(50%);
-            z-index: 20;
+            position: fixed;
+            bottom: 1.2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
             background: linear-gradient(135deg, #ff8fb0, #a87fff);
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 0.75rem 1.8rem;
+            padding: 0.75rem 2rem;
             font-size: 0.92rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 6px 24px rgba(180, 100, 255, 0.45);
+            box-shadow: 0 6px 28px rgba(180, 100, 255, 0.5);
             transition: transform 0.2s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.2s;
             line-height: 1.4;
             text-align: center;
-            letter-spacing: 0.01em;
+            white-space: nowrap;
+            display: none;
             animation: fabPulse 2.5s ease-in-out infinite;
-            margin-bottom: 0.4rem;
         }
 
         @keyframes fabPulse {
@@ -1242,7 +1241,9 @@
 
         function goToReveal() {
             showScreen('screen3');
-            // If photo src is empty, keep emoji
+            // Show the surprise FAB now that we're on the final screen
+            document.getElementById('surpriseFab').style.display = 'inline-block';
+            // If photo loads, show it
             const img = document.getElementById('friendPhoto');
             if (img.src && img.src !== window.location.href) {
                 img.style.display = 'block';
