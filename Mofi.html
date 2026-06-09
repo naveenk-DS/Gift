@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hey Mofi 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffd6e7 0%, #c8e6ff 50%, #ffd6f0 100%);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Floating hearts background */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .heart-float {
+            position: absolute;
+            bottom: -60px;
+            font-size: 1.5rem;
+            animation: floatUp linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: translateY(-110vh) rotate(20deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glass card */
+        .card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.7);
+            border-radius: 28px;
+            padding: 2.5rem 2.2rem 2.2rem;
+            max-width: 420px;
+            width: 90vw;
+            text-align: center;
+            box-shadow: 0 8px 48px rgba(255, 160, 200, 0.18), 0 2px 12px rgba(180, 180, 255, 0.12);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sections visibility */
+        .screen {
+            display: none;
+            animation: fadeScale 0.6s cubic-bezier(.22, 1, .36, 1) both;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.88) translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #c05080;
+            margin-bottom: 0.4rem;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: #8878a8;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .question {
+            font-size: 1.18rem;
+            color: #5a4080;
+            font-weight: 600;
+            margin-bottom: 1.6rem;
+            line-height: 1.4;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.7rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.18s, box-shadow 0.18s, background 0.2s;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: white;
+            opacity: 0;
+            transition: opacity 0.15s;
+            border-radius: inherit;
+        }
+
+        .btn:hover::after {
+            opacity: 0.18;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.06);
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff8fb0, #ff6090);
+            color: white;
+            box-shadow: 0 4px 18px rgba(255, 100, 150, 0.35);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #a0b4ff, #7090ff);
+            color: white;
+            box-shadow: 0 4px 18px rgba(100, 130, 255, 0.3);
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #ffaad0, #c87fbc);
+            color: white;
+            box-shadow: 0 4px 18px rgba(200, 130, 200, 0.35);
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        /* Reveal — correct answer badge */
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffe0f0, #ffc8e0);
+            color: #c0406a;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            padding: 0.35rem 1.2rem;
+            margin-bottom: 1rem;
+            border: 1.5px solid rgba(255, 140, 180, 0.5);
+        }
+
+        /* Apology text */
+        .apology {
+            font-size: 1rem;
+            color: #7a4070;
+            margin: 0.6rem 0 1.2rem;
+            line-height: 1.55;
+        }
+
+        /* Slogan box */
+        .slogan-box {
+            background: rgba(255, 200, 230, 0.3);
+            border: 1.5px solid rgba(255, 160, 210, 0.45);
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            color: #a03070;
+            font-size: 0.97rem;
+            font-style: italic;
+            font-weight: 600;
+            margin: 0.8rem 0 1.2rem;
+            line-height: 1.5;
+        }
+
+        /* Video container */
+        .video-wrap {
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 1rem 0;
+            border: 2px solid rgba(255, 160, 210, 0.4);
+            box-shadow: 0 4px 20px rgba(255, 130, 180, 0.2);
+        }
+
+        .video-wrap video,
+        .video-wrap iframe {
+            width: 100%;
+            display: block;
+            border: none;
+            border-radius: 16px;
+        }
+
+        /* Photo frame */
+        .photo-frame {
+            margin: 1.2rem auto;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd0e8, #c8d8ff, #ffd0e8);
+            background-size: 300% 300%;
+            animation: gradientShift 3s ease infinite, glowPulse 2s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 160, 200, 0.25), 0 0 0 12px rgba(200, 180, 255, 0.15),
+                0 0 30px rgba(255, 140, 190, 0.4);
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 6px rgba(255, 160, 200, 0.25), 0 0 0 12px rgba(200, 180, 255, 0.15), 0 0 30px rgba(255, 140, 190, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(255, 160, 200, 0.35), 0 0 0 18px rgba(200, 180, 255, 0.2), 0 0 50px rgba(255, 140, 190, 0.6);
+            }
+        }
+
+        .photo-inner {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 3rem;
+            border: 2px dashed rgba(255, 140, 180, 0.5);
+            overflow: hidden;
+        }
+
+        .photo-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .photo-placeholder {
+            font-size: 0.7rem;
+            color: #c06090;
+            margin-top: 4px;
+        }
+
+        .final-text {
+            font-size: 1.05rem;
+            color: #9060a0;
+            font-weight: 600;
+            margin-top: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .final-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #c05080;
+            margin-top: 1rem;
+        }
+
+        /* Mini sparkle dots */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 180, 210, 0.8);
+            animation: sparkleAnim 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkleAnim {
+
+            0%,
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ── Reaction emoji on screens ─────────────────────────────── */
+        .screen-reaction {
+            display: inline-block;
+            transition: transform 0.22s cubic-bezier(.34, 1.56, .64, 1);
+            cursor: default;
+            user-select: none;
+        }
+
+        /* Happy jump — triggered when mouse nears YES button */
+        @keyframes happyJump {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1.15);
+            }
+
+            40% {
+                transform: translateY(-14px) scale(1.22);
+            }
+
+            65% {
+                transform: translateY(-7px) scale(1.18);
+            }
+        }
+
+        .screen-reaction.react-happy {
+            animation: happyJump 0.55s cubic-bezier(.34, 1.56, .64, 1) both;
+            filter: drop-shadow(0 4px 14px rgba(255, 90, 140, 0.55));
+        }
+
+        /* Upset shake — triggered when mouse nears NO button */
+        @keyframes upsetShake {
+
+            0%,
+            100% {
+                transform: translateX(0) scale(1.1);
+            }
+
+            20% {
+                transform: translateX(-7px) scale(1.1);
+            }
+
+            40% {
+                transform: translateX(7px) scale(1.1);
+            }
+
+            60% {
+                transform: translateX(-5px) scale(1.1);
+            }
+
+            80% {
+                transform: translateX(5px) scale(1.1);
+            }
+        }
+
+        .screen-reaction.react-upset {
+            animation: upsetShake 0.48s ease-in-out both;
+            filter: drop-shadow(0 4px 14px rgba(90, 110, 255, 0.45));
+        }
+
+        /* Button glow when mouse is near */
+        .btn.btn-near-yes {
+            transform: translateY(-4px) scale(1.09) !important;
+            box-shadow: 0 8px 30px rgba(255, 80, 140, 0.55) !important;
+        }
+
+        .btn.btn-near-no {
+            transform: translateY(-4px) scale(1.09) !important;
+            box-shadow: 0 8px 30px rgba(80, 110, 255, 0.52) !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating hearts -->
+    <div class="hearts-bg" id="heartsContainer"></div>
+
+    <!-- Main card -->
+    <div class="card">
+
+        <!-- Screen 1: Greeting -->
+        <div class="screen active" id="screen1">
+            <div class="screen-reaction" id="emoji-screen1" style="font-size:3.2rem; margin-bottom:0.5rem;">🌸</div>
+            <h1>Hey Mofi!</h1>
+            <p class="subtitle">Someone special has a little surprise for you... 🎀</p>
+            <p class="question">how it is going today? 😂</p>
+            <div class="btn-row">
+                <button class="btn btn-yes" id="s1-yes" onclick="handleAnswer('yes')">Yes, good! 😊</button>
+                <button class="btn btn-no" id="s1-no" onclick="handleAnswer('no')">No 😅</button>
+            </div>
+        </div>
+
+        <!-- Screen 2a: YES answer -->
+        <div class="screen" id="screen2yes">
+            <span class="badge">Ohh... Enjoi Tha 😄</span>
+            <div class="screen-reaction" id="emoji-screen2yes" style="font-size:2rem; margin:0.5rem 0;">🥳</div>
+            <p class="question">You don't have any anger with me, right? </p>
+            <div class="btn-row">
+                <button class="btn btn-yes" id="s2y-yes" onclick="goToReveal()">No anger at all! 💕</button>
+                <button class="btn btn-no" id="s2y-no" onclick="goToReveal()">Maybe a lil 😤</button>
+            </div>
+        </div>
+
+        <!-- Screen 2b: NO answer -->
+        <div class="screen" id="screen2no">
+            <span class="badge">Vidunga Pathukalam 😄</span>
+            <div class="screen-reaction" id="emoji-screen2no" style="font-size:2rem; margin:0.5rem 0;">🤭</div>
+            <p class="question">You don't have any anger with me, right? </p>
+            <div class="slogan-box">
+                "A best friend is someone who knows all your moods,<br>
+                accepts all your flaws, and still chooses you every single day. 🌸"
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-yes" id="s2n-yes" onclick="goToReveal()">Okay fine, no anger! 💖</button>
+                <button class="btn btn-no" id="s2n-no" onclick="goToReveal()">Still not sure 😆</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: Reveal -->
+        <div class="screen" id="screen3">
+
+            <!-- Background watermark: Best Friends Never End -->
+            <div class="bfne-bg" aria-hidden="true">
+                <div class="bfne-text" style="top:8%; left:0;">
+                    💕 Best Friends Never End &nbsp;✨ Best Friends Never End &nbsp;💕 Best Friends Never End &nbsp;✨
+                    Best Friends Never End &nbsp;
+                    💕 Best Friends Never End &nbsp;✨ Best Friends Never End &nbsp;💕 Best Friends Never End &nbsp;✨
+                    Best Friends Never End &nbsp;
+                </div>
+                <div class="bfne-text" style="top:28%; left:0; animation-delay:-6s; animation-direction:reverse;">
+                    🌸 Forever &amp; Always &nbsp;💖 Forever &amp; Always &nbsp;🌸 Forever &amp; Always &nbsp;💖 Forever
+                    &amp; Always &nbsp;
+                    🌸 Forever &amp; Always &nbsp;💖 Forever &amp; Always &nbsp;🌸 Forever &amp; Always &nbsp;💖 Forever
+                    &amp; Always &nbsp;
+                </div>
+                <div class="bfne-text" style="top:68%; left:0; animation-delay:-3s;">
+                    🦋 No Matter What &nbsp;💝 No Matter What &nbsp;🦋 No Matter What &nbsp;💝 No Matter What &nbsp;
+                    🦋 No Matter What &nbsp;💝 No Matter What &nbsp;🦋 No Matter What &nbsp;💝 No Matter What &nbsp;
+                </div>
+                <div class="bfne-text" style="top:88%; left:0; animation-delay:-9s; animation-direction:reverse;">
+                    ⭐ Always There For You &nbsp;🌺 Always There For You &nbsp;⭐ Always There For You &nbsp;🌺 Always
+                    There For You &nbsp;
+                    ⭐ Always There For You &nbsp;🌺 Always There For You &nbsp;⭐ Always There For You &nbsp;🌺 Always
+                    There For You &nbsp;
+                </div>
+            </div>
+
+            <div style="font-size:2.2rem; margin-bottom:0.3rem;">💌</div>
+            <p class="apology">
+                <strong>Sorry if I ever made you upset!</strong><br>
+                But you know no matter what — I'm always here for you. 💛
+            </p>
+
+            <!-- Video section — replace src with actual video URL -->
+            <div class="video-wrap">
+                <video controls poster="" style="border-radius:16px; max-height:220px;" id="friendshipVideo">
+                    <!-- Replace src below with your video file or URL -->
+                    <source src="WhatsApp Video 2026-06-09 at 4.42.39 PM.mp4" type="video/mp4">
+                    <!-- Fallback YouTube embed option — uncomment & paste video ID -->
+                </video>
+                <!-- If using YouTube, remove the <video> above and uncomment this:
+      <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID?rel=0" 
+              height="220" allowfullscreen></iframe>
+      -->
+            </div>
+            <p style="font-size:0.8rem; color:#b090b0; margin-top:-0.4rem; margin-bottom:0.8rem;">
+
+            </p>
+
+            <p class="final-text">Whatever you choose… this smile wins 🌸</p>
+
+            <!-- Photo frame -->
+            <div class="photo-frame">
+                <div class="photo-inner">
+                    <!-- Replace src below with Mofi's photo URL or base64 -->
+                    <img id="friendPhoto" src="Screenshot 2026-06-09 164401.png" alt="Mofi's photo"
+                        onerror="this.style.display='none'; document.getElementById('photoEmoji').style.display='block';">
+                    <span id="photoEmoji">📸</span>
+                    <p class="photo-placeholder">her photo here ✨</p>
+                </div>
+            </div>
+
+            <p class="final-title">Happy Friendship Day 😊</p>
+            <p class="apology" style="margin-top:0.3rem;">
+                Sry for the late greeting wish... but better late than never, right? 💜
+            </p>
+
+            <!-- 🎁 Surprise FAB button — bottom right -->
+            <button class="surprise-fab" id="surpriseFab" onclick="openBdayModal()">
+                🎁 Balancing one<br>surprise for you!
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ── Birthday Surprise Modal ─────────────────────────────────── -->
+    <div class="bday-overlay" id="bdayOverlay">
+        <div class="bday-modal">
+            <button class="bday-close" onclick="closeBdayModal()">✕</button>
+
+            <!-- Step 1: Enter name -->
+            <div id="bdayStep1">
+                <div style="font-size:2.4rem; margin-bottom:0.5rem;">🎂</div>
+                <h3>A Special Surprise Awaits!</h3>
+                <p>Enter your birthday name below,<br>and wait for that magic day... 🌟</p>
+                <input class="bday-input" id="bdayNameInput" type="text" placeholder="Enter your birthday here 🎂"
+                    maxlength="30" onkeydown="if(event.key==='Enter') confirmBday()">
+                <button class="bday-confirm-btn" onclick="confirmBday()">Reveal my surprise! 🎁</button>
+            </div>
+
+            <!-- Step 2: Waiting message (hidden initially) -->
+            <div class="bday-waiting" id="bdayStep2">
+                <span class="wait-emoji">🎊</span>
+                <h3>Hey <span class="wait-name" id="bdayNameDisplay"></span>! 💕</h3>
+                <p>
+                    Your birthday surprise is being wrapped up with love... 🎀<br><br>
+                    <strong style="color:#c05080;">It is NOT a surprise you see today!</strong><br>
+                    Wait for your special day — something truly magical is coming for you on that day! 🌸✨<br><br>
+                    <em style="color:#a060c0; font-size:0.85rem;">Friends who remember your birthday are the best kind
+                        💝</em>
+                </p>
+                <div class="mystery-box">🔒</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Floating hearts ─────────────────────────────────────────────
+        const emojis = ['💕', '🌸', '💖', '✨', '🌺', '💗', '🦋', '🌷', '💝', '⭐'];
+        const container = document.getElementById('heartsContainer');
+
+        function spawnHeart() {
+            const el = document.createElement('span');
+            el.className = 'heart-float';
+            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.fontSize = (1 + Math.random() * 1.4) + 'rem';
+            const dur = 5 + Math.random() * 8;
+            el.style.animationDuration = dur + 's';
+            el.style.animationDelay = '0s';
+            container.appendChild(el);
+            setTimeout(() => el.remove(), dur * 1000);
+        }
+
+        setInterval(spawnHeart, 600);
+        for (let i = 0; i < 8; i++) setTimeout(spawnHeart, i * 300);
+
+        // ── Navigation ──────────────────────────────────────────────────
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active');
+                s.style.display = 'none';
+            });
+            const target = document.getElementById(id);
+            target.style.display = 'block';
+            void target.offsetWidth; // reflow for animation
+            target.classList.add('active');
+        }
+
+        function handleAnswer(ans) {
+            if (ans === 'yes') showScreen('screen2yes');
+            else showScreen('screen2no');
+        }
+
+        function goToReveal() {
+            showScreen('screen3');
+            // If photo src is empty, keep emoji
+            const img = document.getElementById('friendPhoto');
+            if (img.src && img.src !== window.location.href) {
+                img.style.display = 'block';
+                document.getElementById('photoEmoji').style.display = 'none';
+                document.querySelector('.photo-placeholder').style.display = 'none';
+            }
+        }
+
+        // ── Mouse-proximity emoji reactions ──────────────────────────────
+        // Each screen maps: which emoji to change, which buttons to watch,
+        // and what emoji to show for yes-near / no-near / neutral.
+        const SCREEN_CONFIGS = {
+            screen1: { emojiId: 'emoji-screen1', yesId: 's1-yes', noId: 's1-no', neutral: '🌸', nearYes: '😍', nearNo: '😢' },
+            screen2yes: { emojiId: 'emoji-screen2yes', yesId: 's2y-yes', noId: 's2y-no', neutral: '🥳', nearYes: '🥰', nearNo: '😭' },
+            screen2no: { emojiId: 'emoji-screen2no', yesId: 's2n-yes', noId: 's2n-no', neutral: '🤭', nearYes: '🥰', nearNo: '😭' },
+        };
+
+        const PROX = 110; // px — distance to start reacting
+        let _lastState = {}; // track last reaction per screen to avoid flicker
+
+        function btnDist(btnId, mx, my) {
+            const el = document.getElementById(btnId);
+            if (!el) return Infinity;
+            const r = el.getBoundingClientRect();
+            const cx = r.left + r.width / 2;
+            const cy = r.top + r.height / 2;
+            return Math.hypot(mx - cx, my - cy);
+        }
+
+        function applyReaction(cfg, state) {
+            const emojiEl = document.getElementById(cfg.emojiId);
+            const yesEl = document.getElementById(cfg.yesId);
+            const noEl = document.getElementById(cfg.noId);
+            if (!emojiEl) return;
+
+            const prev = _lastState[cfg.emojiId];
+            if (prev === state) return; // nothing changed
+            _lastState[cfg.emojiId] = state;
+
+            // Remove old animation classes first
+            emojiEl.classList.remove('react-happy', 'react-upset');
+            void emojiEl.offsetWidth; // force reflow to restart animation
+
+            if (state === 'yes') {
+                emojiEl.textContent = cfg.nearYes;
+                emojiEl.classList.add('react-happy');
+                yesEl && yesEl.classList.add('btn-near-yes');
+                noEl && noEl.classList.remove('btn-near-no');
+            } else if (state === 'no') {
+                emojiEl.textContent = cfg.nearNo;
+                emojiEl.classList.add('react-upset');
+                noEl && noEl.classList.add('btn-near-no');
+                yesEl && yesEl.classList.remove('btn-near-yes');
+            } else {
+                emojiEl.textContent = cfg.neutral;
+                yesEl && yesEl.classList.remove('btn-near-yes');
+                noEl && noEl.classList.remove('btn-near-no');
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const mx = e.clientX, my = e.clientY;
+            // Find which screen is currently active
+            const activeScreen = document.querySelector('.screen.active');
+            if (!activeScreen) return;
+            const cfg = SCREEN_CONFIGS[activeScreen.id];
+            if (!cfg) return; // screen3 has no yes/no buttons to track
+
+            const dYes = btnDist(cfg.yesId, mx, my);
+            const dNo = btnDist(cfg.noId, mx, my);
+
+            if (dYes < PROX && dYes <= dNo) {
+                applyReaction(cfg, 'yes');
+            } else if (dNo < PROX && dNo < dYes) {
+                applyReaction(cfg, 'no');
+            } else {
+                applyReaction(cfg, 'neutral');
+            }
+        });
+
+        // ── Birthday surprise modal ──────────────────────────────────────
+        function openBdayModal() {
+            // Reset to step 1 each time
+            document.getElementById('bdayStep1').style.display = 'block';
+            document.getElementById('bdayStep2').classList.remove('show');
+            document.getElementById('bdayNameInput').value = '';
+            document.getElementById('bdayOverlay').classList.add('open');
+            setTimeout(() => document.getElementById('bdayNameInput').focus(), 300);
+        }
+
+        function closeBdayModal() {
+            document.getElementById('bdayOverlay').classList.remove('open');
+        }
+
+        function confirmBday() {
+            const name = document.getElementById('bdayNameInput').value.trim();
+            if (!name) {
+                document.getElementById('bdayNameInput').style.borderColor = '#ff5585';
+                document.getElementById('bdayNameInput').placeholder = 'Please enter your birthday! 🎂';
+                return;
+            }
+            // Show name, transition to step 2
+            document.getElementById('bdayNameDisplay').textContent = name;
+            document.getElementById('bdayStep1').style.display = 'none';
+            document.getElementById('bdayStep2').classList.add('show');
+        }
+
+        // Close modal on overlay click
+        document.getElementById('bdayOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('bdayOverlay')) closeBdayModal();
+        });
+    </script>
+</body>
+
+</html>
